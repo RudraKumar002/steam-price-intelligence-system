@@ -30,3 +30,23 @@ The objective of this project is to:
 This system aims to help developers make strategic pricing decisions backed by machine learning insights.
 
 ---
+
+## 📊 Phase 01 – Exploratory Data Analysis (Completed)
+
+The exploratory analysis provided a structured understanding of the Steam dataset’s composition, pricing patterns, and data quality.
+
+### Key Observations
+
+* The dataset contains **94,948 records with no duplicate `appid` entries**, ensuring entity-level integrity.
+* Several columns contain **substantial missing values**, with some features exceeding 50% nulls and requiring removal or careful preprocessing.
+* The **price distribution is highly right-skewed**, dominated by low-cost and free games, with a small number of extreme outliers.
+* Engagement and rating features exhibit **long-tail distributions and placeholder values**, indicating the need for data cleaning and transformation.
+* The dataset combines **structured numerical features and rich textual metadata**, supporting both regression and transformer-based NLP modeling.
+
+These insights establish a strong foundation for the next stage of development.
+
+### ✅ Phase 01 Completed
+
+➡ Moving to **Phase 02 – Data Preprocessing & Feature Engineering**
+
+---

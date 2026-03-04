@@ -101,7 +101,7 @@ These insights informed the feature engineering strategy.
 
 ---
 
-## 📊 Phase 02 – Data Preprocessing & Feature Engineering (Completed)
+## 📊 Phase 02 – Data Preprocessing & Feature Engineering
 
 This phase transformed the raw dataset into a modeling-ready format using only **pre-release predictive signals**.
 
@@ -130,15 +130,95 @@ The dataset is now aligned with real-world deployment constraints.
 
 ---
 
-## 🚀 Phase 03 – Model Training (In Progress)
+## 🚀 Phase 03 – Model Training- Structural Model(Completed)
 
-Planned modeling stages:
+This phase focused on building a **structural classification model** to predict whether a Steam game will launch as **Free-to-Play or Paid** using only **pre-release signals**.
 
-- Baseline classification model
-- XGBoost classifier
-- Structured + TF-IDF feature integration
+### Key Steps
+
+• Built baseline and advanced classification models including:
+
+* Logistic Regression
+* Random Forest
+* XGBoost
+* LightGBM
+
+• Generated **TF-IDF features from `short_description`** to capture gameplay and genre signals.
+
+• Combined **structured metadata and text embeddings** into a unified feature matrix.
+
+• Evaluated models using:
+
+* ROC-AUC
+* PR-AUC
+* F1 Score
+* Precision / Recall
+
+• Applied **precision–recall threshold optimization** to improve minority class detection.
+
+• Conducted **Permutation Feature Importance analysis** to understand model behavior.
+
+• Identified key predictors such as:
+
+* **developer_tier**
+* **language support**
+* **gameplay keywords from descriptions**
+
+• Selected **XGBoost as the final Stage-1 model** based on balanced performance.
+
+---
+
+### Final Model Performance (Test Set)
+
+| Metric   | Score    |
+| -------- | -------- |
+| ROC-AUC  | **0.71** |
+| F1 Score | **0.39** |
+| Accuracy | **0.72** |
+
+The model demonstrates **moderate predictive power using only pre-release signals**, supporting the goal of building an **intellectually honest pricing intelligence system**.
+
+---
+
+### Saved Artifacts
+
+The following artifacts were exported for use in later stages:
+
+* `stage1_xgb_model.pkl`
+* `stage1_threshold.json`
+* `tfidf_vectorizer.pkl`
+* `developer_tier_encoder.pkl`
+
+These artifacts will be used in **Stage-2 price tier prediction**.
+
+---
+
+### ✅ Phase 03 Completed
+
+The **Stage-1 structural monetization model** is finalized and ready to support the next stage: **price range prediction**.
+
+---
+
+## 🚧 Phase 04 – Price Tier Prediction (In Progress)
+
+This phase focuses on predicting the **price range of paid games** using **pre-release structural and textual signals**.
+
+The objective is to estimate **reasonable pricing tiers** for upcoming games based on patterns learned from historical Steam releases.
+
+## Current Work
+
+- Filtered dataset to **paid games only** for pricing analysis
+- Designed **price tier categories** to represent common Steam pricing ranges
+- Preparing structured and textual features for price prediction
+- Building **multi-class classification models** to estimate price tiers
+
+## Planned Modeling Steps
+
+- Baseline **price tier classifier**
+- XGBoost multi-class model
+- Structural + TF-IDF feature integration
 - Model comparison and evaluation
-- Performance analysis and trade-offs
+- Pricing prediction pipeline for new game inputs
 
 ---
 
@@ -147,28 +227,30 @@ Planned modeling stages:
 - Python
 - Pandas / NumPy
 - Scikit-learn
-- XGBoost(planned)
+- **XGBoost**
+- **LightGBM**
 - Matplotlib / Seaborn
 - TF-IDF (NLP)
-- Sentence Transformers (planned)
+- Joblib (model persistence)
 
 ---
 
 ## 🔮 Future Enhancements
 
-- Transformer-based semantic embeddings
-- Feature importance analysis
-- Deployment-ready prediction pipeline
+- Transformer-based semantic embeddings for game descriptions
+- Advanced feature importance and explainability analysis
+- End-to-end **price prediction pipeline** for new game inputs
+- Interactive pricing recommendation tool
 
 ---
 
-## 📎 Portfolio Note
+## 📌 Portfolio Note
 
-This project is structured to reflect production-aware ML thinking, including:
+This project is structured to reflect **production-aware ML system design**, including:
 
-- Data leakage prevention
-- Multi-stage decision modeling
-- Feature stability handling
-- Repository discipline and reproducibility
+- **Data leakage prevention** by restricting features to pre-release signals
+- **Multi-stage modeling architecture** (monetization classification → price tier prediction)
+- **Feature engineering aligned with real deployment constraints**
+- **Reproducible repository structure and saved model artifacts**
 
 ---

@@ -25,10 +25,5 @@ Thumbs.db
 # Logs
 *.log
 
-# Model files (optional later)
-*.pkl
-*.joblib
-*.h5
-
 # VS Code settings
 .vscode/

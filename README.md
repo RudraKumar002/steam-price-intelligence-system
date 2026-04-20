@@ -1,4 +1,4 @@
-# Steam Price Intelligence System
+# **🎮 STEAM PRICE INTELLIGENCE SYSTEM**
 
 An end-to-end machine learning project for predicting Steam game pricing strategy using only pre-release information.
 
@@ -9,7 +9,7 @@ This project is built as a two-stage pricing pipeline:
 3. A RAG-style explanation layer retrieves supporting signals and similar historical games
 4. A Streamlit app exposes the full pipeline through an interactive UI
 
-## Project Goal
+## **Project Goal**
 
 Pricing is one of the most important decisions for indie and mid-scale game developers. Many games are launched with little data support behind pricing choices, which can lead to:
 
@@ -19,7 +19,7 @@ Pricing is one of the most important decisions for indie and mid-scale game deve
 
 This project turns Steam metadata and short descriptions into a practical decision-support system for pricing strategy.
 
-## Dataset Summary
+## **Dataset Summary**
 
 Used Dataset : **"games_march2025_cleaned.csv"**  
 Link : [Steam Games Dataset 2025](https://www.kaggle.com/datasets/artermiloff/steam-games-dataset)
@@ -35,7 +35,7 @@ The analysis in `01_EDA.ipynb` highlights:
 
 The project uses only pre-release signals for modeling to avoid leakage from post-release behavior.
 
-## End-to-End Pipeline
+## **End-to-End Pipeline**
 
 ```mermaid
 flowchart LR
@@ -48,7 +48,7 @@ flowchart LR
     F --> G["Streamlit App"]
 ```
 
-## Notebook Flow
+## **Notebook Flow**
 
 ### 1. `01_EDA.ipynb`
 
@@ -133,7 +133,7 @@ Adds the final explanation layer by:
 
 This turns the project into a complete pricing decision-support pipeline rather than just a prediction model.
 
-## Streamlit App
+## **Streamlit App**
 
 The project includes a Streamlit interface in `app.py`.
 
@@ -154,7 +154,7 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Repository Structure
+## **Repository Structure**
 
 ```text
 steam-price-intelligence-system/
@@ -174,7 +174,7 @@ steam-price-intelligence-system/
 └── visualizations/
 ```
 
-## Saved Artifacts
+## **Saved Artifacts**
 
 Stage 01 artifacts in `notebooks/model01_artifacts/`:
 
@@ -192,7 +192,7 @@ Stage 02 artifacts in `notebooks/model02_artifacts/`:
 - `labelencoder.pkl`
 - `feature_config.pkl`
 
-## Tech Stack
+## **Tech Stack**
 
 - Python
 - pandas
@@ -205,7 +205,7 @@ Stage 02 artifacts in `notebooks/model02_artifacts/`:
 - Streamlit
 - Jupyter Notebook
 
-## Installation
+## **Installation**
 
 Clone the repository and install dependencies:
 
@@ -215,7 +215,7 @@ cd steam-price-intelligence-system
 pip install -r requirements.txt
 ```
 
-## How To Reproduce
+## **How To Reproduce**
 
 Run the notebooks in this order:
 
@@ -233,7 +233,7 @@ Then run the app:
 streamlit run app.py
 ```
 
-## Git Notes
+## **Git Notes**
 
 This repository is configured to keep large data and work-in-progress files out of Git:
 
@@ -252,7 +252,7 @@ The app and notebooks also expect the saved model artifacts inside:
 - `notebooks/model01_artifacts/`
 - `notebooks/model02_artifacts/`
 
-## Key Insights
+## **Key Insights**
 
 - Tags and gameplay-related features are highly informative for free vs paid prediction
 - Developer and publisher strength strongly influence paid price-tier prediction
@@ -260,14 +260,14 @@ The app and notebooks also expect the saved model artifacts inside:
 - Price tier prediction is harder than free vs paid because many paid tiers overlap naturally
 - The explanation layer improves usability by pairing predictions with interpretable evidence
 
-## Limitations
+## **Limitations**
 
 - Stage 02 performance is moderate, especially for adjacent tiers like `budget` vs `low` and `mid` vs `premium`
 - The explanation layer uses a static rule-based knowledge base
 - Similarity retrieval is TF-IDF-based rather than semantic-embedding-based
 - The system does not yet include live market signals such as trends, competition, or regional pricing dynamics
 
-## Future Work
+## **Future Work**
 
 - semantic retrieval with sentence embeddings
 - LLM-based dynamic explanation generation
@@ -275,7 +275,7 @@ The app and notebooks also expect the saved model artifacts inside:
 - regression-based price recommendation on top of classification
 - integration of market competition and trend-aware features
 
-## Final Takeaway
+## **Final Takeaway**
 
 This is not just a classification project. It is a practical pricing intelligence workflow that combines:
 

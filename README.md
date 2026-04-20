@@ -1,256 +1,287 @@
-# 🎮 Steam Price Intelligence System
+# Steam Price Intelligence System
 
-An end-to-end machine learning system designed to analyze Steam game metadata and recommend optimal pricing strategies using only **pre-release information**.
+An end-to-end machine learning project for predicting Steam game pricing strategy using only pre-release information.
 
----
+This project is built as a two-stage pricing pipeline:
 
-## 📌 Project Overview
+1. Stage 01 predicts whether a game is `Free` or `Paid`
+2. Stage 02 predicts the paid game's price tier: `budget`, `low`, `mid`, or `premium`
+3. A RAG-style explanation layer retrieves supporting signals and similar historical games
+4. A Streamlit app exposes the full pipeline through an interactive UI
 
-The **Steam Price Intelligence System** is built to simulate real-world deployment conditions where pricing decisions must be made **before a game is launched**.
+## Project Goal
 
-Instead of relying on post-release engagement metrics, this system uses structured metadata and textual signals available at launch time to provide intelligent pricing recommendations.
+Pricing is one of the most important decisions for indie and mid-scale game developers. Many games are launched with little data support behind pricing choices, which can lead to:
 
----
+- underpricing and lost revenue
+- overpricing and weak conversion
+- inconsistent pricing relative to game scope, audience, and market expectations
 
-## 🧠 Design Principles
+This project turns Steam metadata and short descriptions into a practical decision-support system for pricing strategy.
 
-- Only **pre-release metadata** is used.
-- Post-release metrics (reviews, playtime, ownership, user counts, etc.) are removed to prevent data leakage.
-- The system follows a **two-stage pricing decision pipeline**:
-  1. Predict whether a game should be **Free or Paid**
-  2. If Paid, recommend an appropriate **price tier**
-- Structured and textual features are integrated for multi-modal learning.
-- The workflow mirrors realistic ML deployment practices.
+## Dataset Summary
 
----
+Used Dataset : **"games_march2025_cleaned.csv"**  
+Link : [Steam Games Dataset 2025](https://www.kaggle.com/datasets/artermiloff/steam-games-dataset)
 
-## 🎯 Objective
+The analysis in `01_EDA.ipynb` highlights:
 
-Develop a pricing intelligence system that:
+- 94,948 game records
+- 47 original features
+- mixed numerical, boolean, categorical, and text fields
+- strongly right-skewed pricing distribution
+- around 15.8% free games
+- most games priced below $10
 
-1. Predicts whether a game should be **Free or Paid**
-2. If Paid, recommends a suitable **price tier**
+The project uses only pre-release signals for modeling to avoid leakage from post-release behavior.
 
-The goal is to move beyond simple price prediction and build a structured, data-driven pricing recommendation framework.
+## End-to-End Pipeline
 
----
+```mermaid
+flowchart LR
+    A["Raw Steam Data"] --> B["EDA"]
+    B --> C["Feature Engineering"]
+    C --> D["Stage 01: Free vs Paid"]
+    D -->|Paid Only| E["Stage 02: Price Tier"]
+    D --> F["RAG Explanation Layer"]
+    E --> F
+    F --> G["Streamlit App"]
+```
 
-## 🚨 Problem Statement
+## Notebook Flow
 
-Pricing is one of the most critical strategic decisions for indie game developers.
+### 1. `01_EDA.ipynb`
 
-Games may be:
+Exploratory data analysis to understand:
 
-- Underpriced, leaving potential revenue unrealized  
-- Overpriced, reducing sales volume  
-- Priced without sufficient data-driven insight  
+- missing values
+- duplicate checks
+- price distribution
+- free-to-play keyword leakage
+- platform and metadata patterns
+- early business insights about Steam pricing behavior
 
-This project aims to:
+### 2. `02_Feature_Engineering.ipynb`
 
-- Analyze historical Steam game metadata
-- Identify key pre-release features influencing pricing
-- Engineer predictive structured features
-- Integrate NLP-based textual signals
-- Build classification models for intelligent pricing recommendations
+Transforms the raw dataset into a model-ready dataset by:
 
----
+- removing high-null and leakage-prone columns
+- creating `release_year`, `is_free`, and `price_category`
+- parsing and encoding genres, tags, and categories
+- engineering developer and publisher presence signals
+- log-transforming skewed numeric variables
+- exporting the processed feature dataset
 
-## 📂 Dataset
+Price tiers are defined as:
 
-- Size: ~400MB
-- Not included in the repository due to GitHub size limitations.
-- Available upon request.
-- Place the dataset inside `data/raw/` before running notebooks.
+- `free`: $0.00
+- `budget`: $0.01 to $0.99
+- `low`: $1.00 to $4.99
+- `mid`: $5.00 to $9.99
+- `premium`: above $9.99
 
----
+### 3. `03_Stage1_Binary_Classification_free_vs_paid.ipynb`
 
-## 🗂 Project Structure
+Builds the first-stage classifier using:
 
+- leakage-aware text cleaning
+- temporal train/validation/test splitting
+- structured features plus TF-IDF text features
+- Logistic Regression, Random Forest, XGBoost, and LightGBM
+- PR-AUC-based threshold optimization
+- Platt scaling calibration
+
+Final Stage 01 outcome:
+
+- model: Calibrated LightGBM
+- ROC-AUC: about 0.91
+- PR-AUC: about 0.67
+- F1 score: about 0.65
+- strong free-game recall in an imbalanced setting
+
+### 4. `04_Stage2_Multiclass_Price_tier.ipynb`
+
+Builds the paid-game price tier classifier using:
+
+- paid-game subset only
+- the same engineered structured features
+- the same cleaned TF-IDF description features
+- multiclass LightGBM
+- hyperparameter tuning comparison
+- calibration analysis
+- permutation importance
+
+Final Stage 02 outcome:
+
+- model: Base LightGBM
+- accuracy: about 0.45
+- macro F1: about 0.42
+- ROC-AUC (OVR): about 0.70
+
+The notebook shows that adjacent tiers are naturally harder to separate because price bands overlap in real-world Steam data.
+
+### 5. `05_Rag_Explanation.ipynb`
+
+Adds the final explanation layer by:
+
+- loading the saved Stage 01 and Stage 02 artifacts
+- preparing user input in the same training feature format
+- predicting free vs paid and price tier
+- extracting active signals from genres, tags, categories, and metadata
+- retrieving explanation snippets from a lightweight knowledge base
+- retrieving similar historical Steam games using TF-IDF and cosine similarity
+
+This turns the project into a complete pricing decision-support pipeline rather than just a prediction model.
+
+## Streamlit App
+
+The project includes a Streamlit interface in `app.py`.
+
+Main features:
+
+- manual user input for game metadata
+- notebook-style example presets
+- Stage 01 free vs paid prediction
+- Stage 02 paid price-tier prediction
+- explanation text generated from the RAG layer
+- similar historical game retrieval
+- visibility into prepared model features
+
+Run locally:
+
+```bash
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+## Repository Structure
+
+```text
 steam-price-intelligence-system/
-│   
-├── notebooks/  
-│ ├── 01_EDA.ipynb  
-│ ├── 02_Feature_Engineering.ipynb  
-│ └── 03_Modeling.ipynb 
-│   
-├── data/   
-│ ├── raw/ (ignored in Git)     
-│ └── processed/ (ignored in Git)    
-│   
-├── requirements.txt    
-└── README.md   
+├── app.py
+├── requirements.txt
+├── data/
+│   ├── raw/
+│   └── processed/
+├── notebooks/
+│   ├── 01_EDA.ipynb
+│   ├── 02_Feature_Engineering.ipynb
+│   ├── 03_Stage1_Binary_Classification_free_vs_paid.ipynb
+│   ├── 04_Stage2_Multiclass_Price_tier.ipynb
+│   ├── 05_Rag_Explanation.ipynb
+│   ├── model01_artifacts/
+│   └── model02_artifacts/
+└── visualizations/
+```
 
+## Saved Artifacts
 
----
+Stage 01 artifacts in `notebooks/model01_artifacts/`:
 
-## 📊 Phase 01 – Exploratory Data Analysis (Completed)
+- `model_stage1.pkl`
+- `scaler.pkl`
+- `tfidf.pkl`
+- `threshold.pkl`
+- `feature_config.pkl`
 
-The exploratory analysis established a structured understanding of dataset composition, pricing patterns, and data quality.
+Stage 02 artifacts in `notebooks/model02_artifacts/`:
 
-### Key Observations
+- `model_stage2.pkl`
+- `scaler.pkl`
+- `tfidf.pkl`
+- `labelencoder.pkl`
+- `feature_config.pkl`
 
-- The dataset contains ~95K records with no duplicate `appid` entries.
-- Several columns contained high missingness and required removal.
-- The price distribution is heavily right-skewed.
-- Engagement and rating features exhibit long-tail behavior.
-- The dataset contains both structured metadata and rich textual descriptions.
-
-These insights informed the feature engineering strategy.
-
-✅ Phase 01 Completed
-
----
-
-## 📊 Phase 02 – Data Preprocessing & Feature Engineering
-
-This phase transformed the raw dataset into a modeling-ready format using only **pre-release predictive signals**.
-
-### Key Steps
-
-- Removed irrelevant and high-null columns.
-- Dropped post-release engagement features to prevent leakage.
-- Handled placeholder and invalid values (e.g., `-1`).
-- Engineered structured features including:
-
-  - `is_free`
-  - `price_category`
-  - Language counts
-  - Developer & publisher counts
-  - Developer tier classification
-  - `release_year`
-  - Package counts
-
-- Performed multicollinearity analysis.
-- Identified skewed distributions and applied `log1p` transformation.
-- Finalized a clean, structured feature-engineered dataset.
-
-The dataset is now aligned with real-world deployment constraints.
-
-✅ Phase 02 Completed
-
----
-
-## 🚀 Phase 03 – Model Training- Structural Model(Completed)
-
-This phase focused on building a **structural classification model** to predict whether a Steam game will launch as **Free-to-Play or Paid** using only **pre-release signals**.
-
-### Key Steps
-
-• Built baseline and advanced classification models including:
-
-* Logistic Regression
-* Random Forest
-* XGBoost
-* LightGBM
-
-• Generated **TF-IDF features from `short_description`** to capture gameplay and genre signals.
-
-• Combined **structured metadata and text embeddings** into a unified feature matrix.
-
-• Evaluated models using:
-
-* ROC-AUC
-* PR-AUC
-* F1 Score
-* Precision / Recall
-
-• Applied **precision–recall threshold optimization** to improve minority class detection.
-
-• Conducted **Permutation Feature Importance analysis** to understand model behavior.
-
-• Identified key predictors such as:
-
-* **developer_tier**
-* **language support**
-* **gameplay keywords from descriptions**
-
-• Selected **XGBoost as the final Stage-1 model** based on balanced performance.
-
----
-
-### Final Model Performance (Test Set)
-
-| Metric   | Score    |
-| -------- | -------- |
-| ROC-AUC  | **0.71** |
-| F1 Score | **0.39** |
-| Accuracy | **0.72** |
-
-The model demonstrates **moderate predictive power using only pre-release signals**, supporting the goal of building an **intellectually honest pricing intelligence system**.
-
----
-
-### Saved Artifacts
-
-The following artifacts were exported for use in later stages:
-
-* `stage1_xgb_model.pkl`
-* `stage1_threshold.json`
-* `tfidf_vectorizer.pkl`
-* `developer_tier_encoder.pkl`
-
-These artifacts will be used in **Stage-2 price tier prediction**.
-
----
-
-### ✅ Phase 03 Completed
-
-The **Stage-1 structural monetization model** is finalized and ready to support the next stage: **price range prediction**.
-
----
-
-## 🚧 Phase 04 – Price Tier Prediction (In Progress)
-
-This phase focuses on predicting the **price range of paid games** using **pre-release structural and textual signals**.
-
-The objective is to estimate **reasonable pricing tiers** for upcoming games based on patterns learned from historical Steam releases.
-
-## Current Work
-
-- Filtered dataset to **paid games only** for pricing analysis
-- Designed **price tier categories** to represent common Steam pricing ranges
-- Preparing structured and textual features for price prediction
-- Building **multi-class classification models** to estimate price tiers
-
-## Planned Modeling Steps
-
-- Baseline **price tier classifier**
-- XGBoost multi-class model
-- Structural + TF-IDF feature integration
-- Model comparison and evaluation
-- Pricing prediction pipeline for new game inputs
-
----
-
-## 🛠 Tech Stack
+## Tech Stack
 
 - Python
-- Pandas / NumPy
-- Scikit-learn
-- **XGBoost**
-- **LightGBM**
-- Matplotlib / Seaborn
-- TF-IDF (NLP)
-- Joblib (model persistence)
+- pandas
+- NumPy
+- scikit-learn
+- LightGBM
+- XGBoost
+- SciPy
+- joblib
+- Streamlit
+- Jupyter Notebook
 
----
+## Installation
 
-## 🔮 Future Enhancements
+Clone the repository and install dependencies:
 
-- Transformer-based semantic embeddings for game descriptions
-- Advanced feature importance and explainability analysis
-- End-to-end **price prediction pipeline** for new game inputs
-- Interactive pricing recommendation tool
+```bash
+git clone <your-repo-url>
+cd steam-price-intelligence-system
+pip install -r requirements.txt
+```
 
----
+## How To Reproduce
 
-## 📌 Portfolio Note
+Run the notebooks in this order:
 
-This project is structured to reflect **production-aware ML system design**, including:
+```text
+01_EDA.ipynb
+02_Feature_Engineering.ipynb
+03_Stage1_Binary_Classification_free_vs_paid.ipynb
+04_Stage2_Multiclass_Price_tier.ipynb
+05_Rag_Explanation.ipynb
+```
 
-- **Data leakage prevention** by restricting features to pre-release signals
-- **Multi-stage modeling architecture** (monetization classification → price tier prediction)
-- **Feature engineering aligned with real deployment constraints**
-- **Reproducible repository structure and saved model artifacts**
+Then run the app:
 
----
+```bash
+streamlit run app.py
+```
+
+## Git Notes
+
+This repository is configured to keep large data and work-in-progress files out of Git:
+
+- `data/raw/` is ignored
+- `data/processed/` is ignored
+- `rough_works/` is ignored
+- notebook checkpoints and local environment files are ignored
+
+If someone clones the repo, they will need the dataset files placed back into:
+
+- `data/raw/`
+- `data/processed/`
+
+The app and notebooks also expect the saved model artifacts inside:
+
+- `notebooks/model01_artifacts/`
+- `notebooks/model02_artifacts/`
+
+## Key Insights
+
+- Tags and gameplay-related features are highly informative for free vs paid prediction
+- Developer and publisher strength strongly influence paid price-tier prediction
+- Language coverage, achievements, and production scale help separate low-tier and premium games
+- Price tier prediction is harder than free vs paid because many paid tiers overlap naturally
+- The explanation layer improves usability by pairing predictions with interpretable evidence
+
+## Limitations
+
+- Stage 02 performance is moderate, especially for adjacent tiers like `budget` vs `low` and `mid` vs `premium`
+- The explanation layer uses a static rule-based knowledge base
+- Similarity retrieval is TF-IDF-based rather than semantic-embedding-based
+- The system does not yet include live market signals such as trends, competition, or regional pricing dynamics
+
+## Future Work
+
+- semantic retrieval with sentence embeddings
+- LLM-based dynamic explanation generation
+- improved class balancing and ensemble methods for Stage 02
+- regression-based price recommendation on top of classification
+- integration of market competition and trend-aware features
+
+## Final Takeaway
+
+This is not just a classification project. It is a practical pricing intelligence workflow that combines:
+
+- predictive modeling
+- model calibration
+- retrieval-based interpretability
+- interactive deployment
+
+The result is a decision-support system that can help developers reason about Steam game pricing before launch.

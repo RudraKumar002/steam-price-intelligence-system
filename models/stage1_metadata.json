@@ -1,1 +1,0 @@
-{"model": "XGBoost", "problem": "Free vs Paid Classification", "roc_auc": 0.71, "pr_auc": 0.36, "features": ["developer_tier", "log_developers_count", "log_num_audio_languages", "tfidf_short_description"]}

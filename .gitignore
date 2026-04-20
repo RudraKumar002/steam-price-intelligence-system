@@ -27,3 +27,6 @@ Thumbs.db
 
 # VS Code settings
 .vscode/
+
+# Powerbi workfile
+visualizations/visualizations_v001.pbix
